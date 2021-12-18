@@ -1,13 +1,10 @@
 from flask import jsonify, request, Blueprint
 api = Blueprint('api', __name__)
 
-from db.dbconnect import DataBase
+from controller import Invoice
 
 def jsonifyEvents(**kwargs):
-    return jsonify({**kwargs, 
-                        "success": True, 
-                        "message": "Success"
-                    })
+    return jsonify({**kwargs})
 
 @api.after_request
 def after_request(response):
@@ -20,14 +17,23 @@ def after_request(response):
 
 @api.route("/invoice", methods=["POST"])
 def invoice():
-    if request.method == "POST":
-        doc = request.get_json()
-        data = DataBase().insert(doc)
-        return jsonifyEvents(**data), 200
+    doc = request.get_json()
+    
+    data = Invoice().create_invoice(doc)
+    return jsonifyEvents(**data), 200
+
 
 @api.route("/contact", methods=["PUT"])
 def contact():
-    if request.method == "PUT":
-        doc = request.get_json()
-        data = DataBase().update(doc)
-        return jsonifyEvents(**data), 200
+    doc = request.get_json()
+    
+    data = Invoice().update_contact(doc)
+    return jsonifyEvents(**data), 200
+
+
+@api.route("/suggest/invoice", methods=["GET"])
+def suggest_invoice():
+    doc = request.get_json()
+    
+    data = Invoice().suggest_invoice(doc)
+    return jsonifyEvents(**data), 200
